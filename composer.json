@@ -1,0 +1,18 @@
+{
+    "name": "alejandro/portfolio-api",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "AlexMartinez",
+            "email": "173128885+AlaxMart@users.noreply.github.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
