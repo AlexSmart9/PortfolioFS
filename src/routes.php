@@ -2,6 +2,7 @@
 
 use App\Controllers\UserController;
 use App\Controllers\ProjectController;
+use App\Controllers\AuthController;
 
 // User Static Routes:
 // Get All
@@ -40,3 +41,6 @@ $router->put('/api/projects/{id}', [ProjectController::class, 'updateProject']);
 // Delete
 $router->delete('/api/projects/{id}', [ProjectController::class, 'deleteProject']);
 
+
+// Login route
+$router->post('/api/login', [AuthController::class, 'login']);
