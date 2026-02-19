@@ -52,6 +52,6 @@ class Router {
         }
 
         http_response_code(404);
-        echo json_encode(["Bienvenido, todo funcionando por aqui ✨🚀"]); 
+        echo json_encode(["Error en el servidor ⚡🔥"]); 
     }
 }

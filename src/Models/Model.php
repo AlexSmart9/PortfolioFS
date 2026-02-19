@@ -13,8 +13,8 @@ abstract class Model {
 
     //Generic method to get all data.
     public function getAll() {
-        
-        $query = "SELECT * FROM {$this->table} ORDER BY id DESC";
+        $table = $this->table;
+        $query = "SELECT * FROM {$table} ORDER BY id DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         
@@ -37,51 +37,56 @@ abstract class Model {
         
         $query = "DELETE FROM {$this->table} WHERE id = :id";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id);
+        $stmt->execute(['id' => $id]);
 
-        if($stmt->execute()) {
-            return true;
-        }
+        return $stmt->rowCount() > 0;;
+    }
 
-        return false;
+    // Generic method to create data
+    public function create($data) {
+
+        // Getting the keys
+        $keys = array_keys($data);
+
+        // Creating string columns
+        $columns = implode(", ",$keys);
+
+        // Creating a placeholders string
+        $placeholders = ":" . implode(", :", $keys);
+
+        // Bulding the final SQL query.
+        $sql = "INSERT INTO {$this->table} ($columns) VAlUES ($placeholders)";
+
+        $stmt = $this->conn->prepare($sql);
+
+        // Executing throwing the clean array data
+        return $stmt->execute($data);
     }
 
     //Generic method to update data.
     public function update($id, $data) {
         
         //1. Preparing the parts of the SQL query.
-        $fields = [];
-        foreach($data as $key =>$value) {
-            $fields[] = "{$key} = :{$key}";
+        $fields = "";
+        foreach($data as $key => $value) {
+            $fields .= "$key = :$key, ";
         }
 
-        //2. Combining the array into a comma-separated string
-        $setClause = implode(', ', $fields);
+        $fields = rtrim($fields, ", ");
 
-        //3. Bulding the final sQL query.
-        $query = "UPDATE {$this->table} SET {$setClause} WHERE id = :id";
 
-        try {
+        //3. Bulding the final SQL query.
+        $query = "UPDATE {$this->table} SET $fields WHERE id = :id";
             
-            $stmt = $this->conn->prepare($query);
+        $stmt = $this->conn->prepare($query);
 
-            //4. Linking the array values (Binding).
+        //4. Linking the array values (Binding).
+        $data['id'] = $id;
 
-            foreach($data as $key => $value){
-                $stmt->bindValue(":{$key}", $value);
-            }
+        $stmt->execute($data);
+            
+        return $stmt->rowCount() > 0;
 
-            //5. Linking the id.
-            $stmt->bindValue(':id', $id);
-
-            //6. Executing
-            return $stmt->execute();
-
-
-        } catch (\PDOException $e) {
-            echo "Error update" . $e->getMessage();
-            return false;
-        }
     }
 }
 

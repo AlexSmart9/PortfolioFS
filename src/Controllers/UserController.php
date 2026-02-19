@@ -27,17 +27,34 @@ class UserController {
         
         $user = $this->userModel->getById($id);
 
-        http_response_code(200);
-        echo json_encode($user);
+        if ($user) {
+            
+            http_response_code(200);
+            echo json_encode($user);
+
+        } else {
+            http_response_code(404);
+            echo json_encode(["error" => "User Not Found"]);
+        }
     }
 
     //Method to create a user.
     public function createUser() {
+
+        // Reading data from body
         $data = json_decode(file_get_contents("php://input"), true);
+        
+        if(isset($data['title']) && $this->userModel->create($data)) {
+            
+            http_response_code(201); // 201 Created
+            echo json_encode(["message" => "User created successfully!"]);
 
-        http_response_code(201);
-
-        echo json_encode(["message" => "Usuario creado simulado", "data" => $data]);
+        } else {
+            
+            http_response_code(500);
+            echo json_encode(["error" => "Failed creating user"]);
+        
+        }
     }
 
     //Metho to update a user.
@@ -65,13 +82,15 @@ class UserController {
         $success = $this->userModel->delete($id);
 
         if ($success) {
-            // 204 = No Content (Éxito pero sin mensaje)
-            // O usamos 200 si queremos mandar un JSON de confirmación
+            
             http_response_code(200);
             echo json_encode(["message" => "Usuario eliminado correctamente"]);
+
         } else {
+
             http_response_code(404);
             echo json_encode(["error" => "Usuario no encontrado"]);
+        
         }
 
     }

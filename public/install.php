@@ -7,22 +7,24 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use App\Database;
 use App\Models\User;
+use App\Models\Project;
 use Dotenv\Dotenv;
 
-// 1. Cargar configuración
+// 1. Load config
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
-// 2. Conexión
-
+// 2. Getting the connection
 $db = Database::getConnection();
 
-// 3. Instanciar Modelo
+// 3. Creating Instance Model
 $userModel = new User($db);
+$projectModel = new Project($db);
 
 // 4. Crear la Tabla
 echo "Intentando crear tabla 'users'...\n";
 $userModel->createTable();
+$projectModel->createTable();
 
 // 5. Insertar Usuario Admin por defecto (Para que puedas probar ya)
 // Verificamos si ya existe para no duplicarlo
