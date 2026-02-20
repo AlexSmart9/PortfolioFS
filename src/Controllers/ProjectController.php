@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\Project;
+use App\Middleware\AuthMiddleware;
 
 class ProjectController {
 
@@ -44,6 +45,10 @@ class ProjectController {
     //Method to create a project
     public function createProject() {
 
+        //Autenticatiom
+        $user = AuthMiddleware::authenticate();
+
+
         // Reading data from body
         $data = json_decode(file_get_contents("php://input"), true);
         
@@ -63,6 +68,9 @@ class ProjectController {
 
     //Method to update a project
     public function updateProject($id) {
+
+        //Aitemtication
+        AuthMiddleware::authenticate();
 
         // Reading the new dara
         $data = json_decode(file_get_contents("php://input"), true);
@@ -86,6 +94,10 @@ class ProjectController {
     // Method to delete a Project
     public function deleteProject($id) {
 
+
+        // Autentication
+        AuthMiddleware::authenticate();
+        
         $success = $this->projectModel->delete($id);
 
         if ($success) {
