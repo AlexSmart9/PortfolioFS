@@ -2,13 +2,9 @@
 // Este archivo solo sirve para instalar la BD.
 // Una vez que funcione, no necesitas visitarlo de nuevo.
 
-require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Database;
-use App\Models\User;
-use App\Models\Project;
-use App\Models\Certification;
-use App\Models\Skill;
 use Dotenv\Dotenv;
 
 // 1. Load config
@@ -18,40 +14,35 @@ $dotenv->load();
 // 2. Getting the connection
 $db = Database::getConnection();
 
+echo "Iniciando instalación dinámica de tablas...\n";
+echo "-----------------------------------------\n";
 
-// 3. Creating Instance Model
-$userModel = new User($db);
-$projectModel = new Project($db);
-$certificationModel = new Certification($db);
-$skillModel = new Skill($db);
+// 3. Scaning files inside Models folder
+$modelFIles = glob(__DIR__ . '/src/Models/*.php');
 
-// 4. Crear la Tabla
-$userModel->createTable();
-$projectModel->createTable();
-$certificationModel->createTable();
-$projectModel->createTable();
-$skillModel->createTable();
+foreach($modelFIles as $file) {
 
-// 5. Insertar Usuario Admin por defecto (Para que puedas probar ya)
-// Verificamos si ya existe para no duplicarlo
-$existingUser = $userModel->getByEmail('admin@test.com');
+    // 4. Extract name without .php extention
+    $className = basename($file, '.php');
 
-if (!$existingUser) {
-    echo "Creando usuario administrador...\n";
-    $sql = "INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)";
-    $stmt = $db->prepare($sql);
-    
-    $stmt->execute([
-        ':name' => 'Admin Supremo',
-        ':email' => 'admin@test.com',
-        ':password' => password_hash('123456', PASSWORD_BCRYPT), // ¡Contraseña segura!
-        ':role' => 'admin'
-    ]);
-    echo "¡Usuario Admin creado con éxito!\n";
-    echo "Email: admin@test.com\n";
-    echo "Pass: 123456\n";
-} else {
-    echo "El usuario admin ya existe.\n";
+    // 5. Ignore base class Model
+    if($className === 'Model') {
+        continue;
+    }
+
+    // 6. Build full class name whit it's Namespace
+    $fullClassName = "\\App\\Models\\$className";
+
+    if (class_exists($fullClassName)) {
+
+        $modelInstance = new $fullClassName($db);
+
+        if(method_exists($modelInstance, 'createTable')) {
+            $modelInstance->createTable();
+            echo "📂Tables created succesfuly for model: $className";
+        }
+    }
 }
 
-echo "--- INSTALACIÓN COMPLETADA ---";
+echo "-----------------------------------------\n";
+echo "¡Instalación y escaneo completados!\n";
