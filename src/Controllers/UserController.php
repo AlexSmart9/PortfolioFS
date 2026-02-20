@@ -68,11 +68,11 @@ class UserController {
 
         if ($success) {
             http_response_code(200);
-            echo json_encode(["message" => "Usuario actualizado correctamente"]);
+            echo json_encode(["message" => "User updated succesfuly"]);
         } else {
-            // Si falló (probablemente el ID no existe o error SQL)
-            http_response_code(404); // O 500 dependiendo del error
-            echo json_encode(["error" => "No se pudo actualizar el usuario (ID no encontrado)"]);
+        
+            http_response_code(404); 
+            echo json_encode(["error" => "Skill not found"]);
         }
     }
 
