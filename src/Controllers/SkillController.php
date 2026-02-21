@@ -99,7 +99,7 @@ class SkillController {
 
         if($succes) {
             
-            http_response_code(204);
+            http_response_code(200);
             echo json_encode(["message" => "Skill deleted succesfuly"]);
         } else {
 
