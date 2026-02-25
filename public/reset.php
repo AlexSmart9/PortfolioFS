@@ -8,11 +8,11 @@ $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
 use App\Database;
-// Importamos nuestros modelos explícitamente
 use App\Models\User;
 use App\Models\Project;
 use App\Models\Certification;
 use App\Models\Skill;
+use App\Models\Post;
 
 $db = Database::getConnection();
 
@@ -21,7 +21,7 @@ echo "-----------------------------------------\n";
 
 try {
     // 1. Limpieza total
-    $db->exec("DROP TABLE IF EXISTS users, projects, certifications, skills CASCADE");
+    $db->exec("DROP TABLE IF EXISTS users, projects, certifications, skills, posts CASCADE");
     echo "🗑️ Tablas eliminadas correctamente.\n";
 
     // 2. Reconstrucción explícita y ordenada
@@ -29,19 +29,21 @@ try {
     
     $userModel = new User($db);
     $userModel->createTable();
-    echo "   ✅ Tabla 'users' lista.\n";
+ 
+    $postModel = new Post($db);
+    $postModel->createTable();
 
     $projectModel = new Project($db);
     $projectModel->createTable();
-    echo "   ✅ Tabla 'projects' lista.\n";
+ 
 
     $certModel = new Certification($db);
     $certModel->createTable();
-    echo "   ✅ Tabla 'certifications' lista.\n";
+ 
 
     $skillModel = new Skill($db);
     $skillModel->createTable();
-    echo "   ✅ Tabla 'skills' lista.\n";
+
 
     // 3. Crear Admin
     echo "👑 Insertando al Admin Supremo...\n";

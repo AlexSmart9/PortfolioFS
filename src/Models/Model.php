@@ -45,7 +45,7 @@ abstract class Model {
         $placeholders = ":" . implode(", :", $keys);
         
         // Bulding the final SQL query.
-        $sql = "INSERT INTO {$this->table} ($columns) VAlUES ($placeholders)";
+        $sql = "INSERT INTO {$this->table} ($columns) VALUES ($placeholders)";
         
         $stmt = $this->conn->prepare($sql);
         
@@ -88,7 +88,7 @@ abstract class Model {
             $stmt = $this->conn->prepare($query);
             $stmt->execute(['id' => $id]);
     
-            return $stmt->rowCount() > 0;;
+            return $stmt->rowCount() > 0;
         }
     }
 

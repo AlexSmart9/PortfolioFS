@@ -5,6 +5,8 @@ use App\Controllers\ProjectController;
 use App\Controllers\AuthController;
 use App\Controllers\CertificationController;
 use App\Controllers\SkillController;
+use App\Controllers\PostController;
+
 
 // User Static Routes:
 // Get All
@@ -79,3 +81,23 @@ $router->put('/api/skills/{id}', [SkillController::class, 'updateSkill']);
 // Delete
 $router->delete('/api/skills/{id}', [SkillController::class, 'deleteSkill']);
 
+// Post Static Routes
+// Get All
+$router->get('/api/posts', [PostController::class, 'getAllPosts']);
+
+// Create
+$router->post('/api/posts', [PostController::class, 'createPost']);
+
+// Posts search function
+// Search By Title
+$router->get('/api/posts/search', [PostController::class, 'searchPost']);
+
+// Posts dinamic routes
+// Get By Id
+$router->get('/api/posts/{{id}', [PostController::class, 'getPostById']);
+
+// Update
+$router->put('/api/posts/{id}', [PostController::class, 'updatePost']);
+
+//Delete
+$router->delete('/api/posts/{id}', [PostController::class, 'deletePost']);
