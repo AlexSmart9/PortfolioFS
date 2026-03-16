@@ -1,33 +1,31 @@
-
+# 1. Usar la imagen oficial
 FROM php:8.2-apache
 
+# 2. Instalar herramientas y traductor de Postgres
+RUN apt-get update && apt-get install -y libpq-dev unzip git && docker-php-ext-install pdo pdo_pgsql
 
-RUN a2dismod mpm_event mpm_worker || true
-
-
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
-
-
-RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    unzip \
-    git \
-    && docker-php-ext-install pdo pdo_pgsql
-
-
+# 3. Traer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-
+# 4. Habilitar mod_rewrite para tu Router y .htaccess
 RUN a2enmod rewrite
 
+# 5. Crea una configuración pura de VirtualHost sin tocar archivos globales
+RUN { \
+    echo '<VirtualHost *:80>'; \
+    echo '    DocumentRoot /var/www/html/public'; \
+    echo '    <Directory /var/www/html/public>'; \
+    echo '        AllowOverride All'; \
+    echo '        Require all granted'; \
+    echo '    </Directory>'; \
+    echo '</VirtualHost>'; \
+} > /etc/apache2/sites-available/000-default.conf
 
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
-
+# 6. Copiar tu código
 COPY . /var/www/html/
+
+# 7. Instalar dependencias de PHP
 RUN composer install --no-dev --optimize-autoloader
 
-
+# 8. Dar permisos al servidor
 RUN chown -R www-data:www-data /var/www/html
