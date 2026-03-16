@@ -20,7 +20,7 @@ use App\Router;
 use Dotenv\Dotenv;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+$dotenv->safeLoad();
 
 //Database
 $db = Database::getConnection();

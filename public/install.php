@@ -9,7 +9,7 @@ use Dotenv\Dotenv;
 
 // 1. Load config
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+$dotenv->safeLoad();
 
 // 2. Getting the connection
 $db = Database::getConnection();
