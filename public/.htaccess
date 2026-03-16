@@ -1,0 +1,15 @@
+# Disable directory browsing
+Options -Indexes
+
+# Enable URL Rewriting
+RewriteEngine On
+
+# Ensure the server knows the Base is the current folder
+RewriteBase /
+
+# If the requested filename is NOT a real file...
+RewriteCond %{REQUEST_FILENAME} !-f
+# ...and is NOT a real directory
+RewriteCond %{REQUEST_FILENAME} !-d
+# ...then send the request to index.php
+RewriteRule ^ index.php [L]
