@@ -22,5 +22,14 @@ RUN composer install --no-dev --optimize-autoloader
 # 7. Set permissions
 RUN chown -R www-data:www-data /var/www/html
 
-# 8. THE MASTER STRIKE: Bind dynamic PORT at RUNTIME and start Apache
-CMD bash -c "sed -i 's/Listen 80/Listen \${PORT:-80}/g' /etc/apache2/ports.conf && sed -i 's/:80/:\${PORT:-80}/g' /etc/apache2/sites-available/000-default.conf && a2dismod mpm_event mpm_worker 2>/dev/null || true && a2enmod mpm_prefork && apache2-foreground"
+# 8. Create a bulletproof startup script
+RUN echo '#!/bin/bash' > /start.sh && \
+    echo 'sed -i "s/Listen 80/Listen ${PORT:-80}/g" /etc/apache2/ports.conf' >> /start.sh && \
+    echo 'sed -i "s/:80/:${PORT:-80}/g" /etc/apache2/sites-available/000-default.conf' >> /start.sh && \
+    echo 'a2dismod mpm_event mpm_worker 2>/dev/null || true' >> /start.sh && \
+    echo 'a2enmod mpm_prefork' >> /start.sh && \
+    echo 'apache2-foreground' >> /start.sh && \
+    chmod +x /start.sh
+
+# 9. Execute the script on startup
+CMD ["/start.sh"]
