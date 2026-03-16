@@ -1,10 +1,10 @@
 <?php
-// 1. Forzar errores desde la línea 1
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// 2. IMPORTACIONES AL PRINCIPIO (Regla de PHP)
+
 use App\Database;
 use App\Models\User;
 use App\Models\Project;
@@ -12,7 +12,6 @@ use App\Models\Certification;
 use App\Models\Skill;
 use App\Models\Post;
 
-// 3. La Red de Seguridad Absoluta
 try {
     require_once __DIR__ . '/../vendor/autoload.php';
 
