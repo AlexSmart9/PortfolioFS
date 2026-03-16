@@ -94,7 +94,7 @@ $router->get('/api/posts/search', [PostController::class, 'searchPost']);
 
 // Posts dinamic routes
 // Get By Id
-$router->get('/api/posts/{{id}', [PostController::class, 'getPostById']);
+$router->get('/api/posts/{id}', [PostController::class, 'getPostById']);
 
 // Update
 $router->put('/api/posts/{id}', [PostController::class, 'updatePost']);
