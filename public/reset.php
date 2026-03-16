@@ -46,11 +46,16 @@ try {
 
 
     // 3. Crear Admin
+    $adminEmail = $_ENV['ADMIN_EMAIL'];
+    $adminPass = $_ENV['ADMIN_PASS'];
     echo "👑 Insertando al Admin Supremo...\n";
-    $hashedPassword = password_hash('123456', PASSWORD_BCRYPT);
-    $sqlAdmin = "INSERT INTO users (name, email, password, role) VALUES ('Alejandro Admin', 'admin@test.com', :password, 'admin')";
+    $hashedPassword = password_hash($adminPass, PASSWORD_BCRYPT);
+    $sqlAdmin = "INSERT INTO users (name, email, password, role) VALUES ('Alejandro', :email , :password, 'admin')";
     $stmt = $db->prepare($sqlAdmin);
-    $stmt->execute(['password' => $hashedPassword]);
+    $stmt->execute([
+          'email' => $adminEmail,
+          'password' => $hashedPassword
+      ]);
 
     echo "-----------------------------------------\n";
     echo "🚀 ¡SISTEMA 100% RESTAURADO Y OPERATIVO!\n";

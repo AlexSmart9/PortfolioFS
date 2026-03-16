@@ -38,15 +38,27 @@ class Database {
 
     //Static method tp get the instance
     public static function getConnection() {
-        
-        //If the instance desn't exis, then it's created.
-        if(self::$instance === null){
-            self::$instance = new Database();
+        $host = $_ENV['DB_HOST'];
+        $port = $_ENV['DB_PORT'];
+        $db   = $_ENV['DB_DATABASE'];
+        $user = $_ENV['DB_USERNAME'];
+        $pass = $_ENV['DB_PASSWORD'];
 
+        // 1. Extraemos el Endpoint ID de Neon (es la primera parte de tu DB_HOST antes del primer punto)
+        $endpointId = explode('.', $host)[0];
+
+        // 2. Armamos la cadena DSN con los requisitos estrictos de Neon: sslmode y options
+        $dsn = "pgsql:host={$host};port={$port};dbname={$db};sslmode=require;options=endpoint={$endpointId}";
+
+        try {
+            $pdo = new \PDO($dsn, $user, $pass);
+            
+            // Para que los errores de la BD nos avisen claramente si algo falla
+            $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            
+            return $pdo;
+        } catch (\PDOException $e) {
+            die("Error de conexión: " . $e->getMessage());
         }
-        
-        //Returning the connection of the instance.
-        return self::$instance->connection;
-        
     }
 }

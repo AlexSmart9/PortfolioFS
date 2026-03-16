@@ -52,6 +52,11 @@ class Router {
         }
 
         http_response_code(404);
-        echo json_encode(["Error en el servidor ⚡🔥"]); 
+        echo json_encode([
+            "error" => "Ruta no encontrada 🕵️‍♂️",
+            "metodo_recibido" => $method,
+            "uri_buscada" => $uri,
+            "rutas_disponibles_para_este_metodo" => array_keys($this->routes[$method] ?? [])
+        ]);
     }
 }

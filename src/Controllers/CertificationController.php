@@ -4,8 +4,11 @@ namespace App\Controllers;
 
 use App\Models\Certification;
 use App\Middleware\AuthMiddleware;
+use APp\Traits\ImageUploader;
 
 class CertificationController {
+
+    use ImageUploader;
 
     private $certificationModel;
 
@@ -59,68 +62,18 @@ class CertificationController {
 
         ];
 
-        if(!$data['title']) {
+        try {
+          $data['image_url'] = $this->HandleImageUpload('image', 'certifications');
 
-            http_response_code(400);
-            echo json_encode(["error" => "Tilte is required"]);
-
-            return;
-        }
-
-        // Verifying if they sent a file called 'image' and if it uploaded succesful
-        if(isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-
-        $uploadDir = __DIR__ . '/../../public/uploads/certifications/';
-
-            if(!is_dir($uploadDir)) {
-
-                mkdir($uploadDir, 0777, true);
-
-            }
-
-            $fileTmpPath = $_FILES['image']['tmp_name'];
-            
-            $fileName = $_FILES['image']['name'];
-
-            //Validating extension
-            $allowedExts = ['jpg','jpeg','png','webp'];
-            $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-
-            if (!in_array($fileExt, $allowedExts)) {
-                http_response_code(400);
-                echo json_encode(["error" => "Invalid file type."]);
-                return;
-            }
-
-            // Rename file
-            $newFileName = uniqid() . '.' . $fileExt;
-            $destPath = $uploadDir . $newFileName;
-
-            // Move file from tempo memory to our public folder
-            if(move_uploaded_file($fileTmpPath, $destPath)) {
-
-                $data['image_url'] = '/uploads/certifications/' . $newFileName;
-
-            } else {
-                
-                http_response_code(500);
-                echo json_encode(["error"=> "Error saving image on server"]);
-
-            }
-
-        }
-        
-        // Saving on Database using smart model
-        if($this->certificationModel->create($data)) {
-
+          $certification = $this->certificationModel->create($data);
+          if($certification) {
             http_response_code(201);
-            echo json_encode(["message" => "Certification created succesful",
-            "image" => $data['image_url']
-                
-            ]);
-        }
-            
-            
+            echo json_encode(["message" => "Certification created succesfully!"]);
+          }
+        } catch (\Exception $e) {
+            http_response_code(400);
+            echo json_encode(["error" => $e->getMessage()]);
+        }    
     }
             
     // Meethod to update a certification

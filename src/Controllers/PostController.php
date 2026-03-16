@@ -4,8 +4,11 @@ namespace App\Controllers;
 
 use App\Models\Post;
 use App\Middleware\AuthMiddleware;
+use App\Traits\ImageUploader;
 
 class PostController {
+
+    use ImageUploader;
 
     protected $postModel;
 
@@ -41,18 +44,14 @@ class PostController {
 
     }
 
-    // Metho to create Post 
+    // Method to create Post 
     public function createPost() {
 
+
+        
+
         $user = AuthMiddleware::authenticate();
-
-        $authorId = $user->data->id ?? $user->id ?? null;
-
-        if(!$authorId) {
-            http_response_code(403);
-            echo json_encode(["error" => "Security Breach> User ID missing form token"]);
-            return;
-        }
+      
 
         $data = [
             'title' => $_POST['title'] ?? null,
@@ -60,75 +59,19 @@ class PostController {
             'image_url' => null
         ];
 
-        if (!$data['title'] || !$data['content']) {
-            http_response_code(400);
-            echo json_encode(["error" => "Title and content are required"]);
-            return;
-        }
+        try {
+          $data['image_url'] = $this->HandleImageUpload('image', 'posts');
 
-        json_decode($data['content']);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            http_response_code(400);
-            echo json_encode(["error" => "The 'content' field must be a valid JSON string."]);
-            return;
-        }
-
-        if(isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/../../public/uploads/posts';
-
-            if(!is_dir($uploadDir)) {
-                
-                mkdir($uploadDir, 0777, true);
-
-            }
-
-            $fileExt = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-            $allowedExts = ['jpg', 'jpeg', 'png', 'webp'];
-
-            if(in_array($fileExt, $allowedExts)) {
-                $newFileName = uniqid() . ',' . $fileExt;
-                if(move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $newFileName)) {
-
-                    $data['image_url'] = '/uploads/posts/' . $newFileName;
-                }
-            }
-         }
-
-         if($this->postModel->create($data)) {
-
+          $post = $this->postModel->create($data);
+          
+          if($post) {
             http_response_code(201);
-            echo json_encode(["message" => "Blog post publiched succesfully",
-            "image" =>$data['image_url']]);
-
-         } else {
-            
-            http_response_code(500);
-            echo json_encode(["error" => "Failed to save post to database"]);
-
-         }
-
-    }
-
-    // Method to update a post
-    public function updatePost($id) {
-
-        AuthMiddleware::authenticate();
-
-        $data = json_decode(file_get_contents("php://input"), true);
-
-        $succes = $this->postModel->update($id, $data);
-
-        if($succes) {
-
-            http_response_code(200);
-            echo json_encode(["message" => "Post updated Succesfully"]);
-
-        } else {
-            
-            http_response_code(404);
-            echo json_encode(["error" => "Post not fond"]);
+            echo json_encode(["message" => "Post created successfully!"]); 
+          }
+        } catch (\Exception $e) {
+            http_response_code(400);
+            echo json_encode(["error" => $e->getMessage()]);
         }
-
     }
 
     // Method to delete  post

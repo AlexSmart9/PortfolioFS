@@ -4,8 +4,11 @@ namespace App\Controllers;
 
 use App\Models\Project;
 use App\Middleware\AuthMiddleware;
+use App\Traits\ImageUploader;
 
 class ProjectController {
+
+    use ImageUploader;
 
     private $projectModel;
 
@@ -45,7 +48,7 @@ class ProjectController {
     //Method to create a project
     public function createProject() {
 
-        //Autenticatiom
+          //Autenticatiom
         $user = AuthMiddleware::authenticate();
 
         // reading directly POST REQUEST
@@ -58,69 +61,18 @@ class ProjectController {
             
         ]; 
 
-        if (!$data['title']) {
+        try {
+          $data['image_url'] = $this->HandleImageUpload('image', 'projects');
 
+          $project = $this->projectModel->create($data);
+          if($project) {
+            http_response_code(201);
+            echo json_encode(["message" => "Project created successfully!"]); 
+          }
+        } catch (\Exception $e) {
             http_response_code(400);
-            echo json_encode(["error" => "Title is required"]);
-
-            return;
+            echo json_encode(["error" => $e->getMessage()]);
         }
-
-        // Verifying if they sent a file called 'image and if it uploaded succesful
-
-        if(isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-
-            $uploadDir = __DIR__ . '/../../public/uploads/projects/';
-
-            if(!is_dir($uploadDir)) {
-                
-                mkdir($uploadDir, 0777, true);
-            }
-
-            $fileTmpPath = $_FILES['image']['tmp_name'];
-
-            $fileName = $_FILES['image']['name'];
-
-            // Validating extension
-            $allowedExts = ['jpg','jpeg','png','webp'];
-            $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-
-            if (!in_array($fileExt, $allowedExts)) {
-                http_response_code(400);
-                echo json_encode(["error" => "Invalid file type."]);
-                return;
-            }
-
-            // Rename file
-            $newFileName = uniqid() . '.' . $fileExt;
-            $destPath = $uploadDir . $newFileName;
-            
-            // Moving file from temp memory to our public folder
-            if(move_uploaded_file($fileTmpPath, $destPath)) {
-
-                $data['image_url'] = '/uploads/projects/' . $newFileName;
-
-            } else {
-                http_response_code(500);
-                echo json_encode(["error"=> "Error saving image on server"]);
-            }
-
-            // Saving on database using smart model
-            if($this->projectModel->create($data)) {
-                http_response_code(201);
-                echo json_encode([
-                    "message" => "Project created succesfuly",
-                    "image" => $data['image_url']
-                ]);
-            } else {
-
-                http_response_code(500);
-                echo json_encode(["error" => "Fail saving project on database"]); 
-
-            }
-
-        }
-
 
     }
 
