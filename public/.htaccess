@@ -7,9 +7,8 @@ RewriteEngine On
 # Ensure the server knows the Base is the current folder
 RewriteBase /
 
-# If the requested filename is NOT a real file...
+# Handle API routes properly
 RewriteCond %{REQUEST_FILENAME} !-f
-# ...and is NOT a real directory
 RewriteCond %{REQUEST_FILENAME} !-d
-# ...then send the request to index.php
-RewriteRule ^ index.php [L]
+# Pass the path directly to index.php
+RewriteRule ^(.*)$ index.php [L,QSA]

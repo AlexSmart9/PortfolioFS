@@ -22,41 +22,48 @@ class Router {
     }
 
     public function dispatch($uri, $method, $dbConnection) {
+        // 1. Clean the URI: remove query strings and trim slashes
         $uri = parse_url($uri, PHP_URL_PATH);
+        $uri = ($uri !== '/') ? rtrim($uri, '/') : $uri;
 
         if (!isset($this->routes[$method])) {
-            http_response_code(404);
+            http_response_code(405);
             echo json_encode(["error" => "Method not allowed"]);
             return;
         }
 
-        // 
-        if(isset($this->routes[$method][$uri])) {
-            $action = $this->routes[$method][$uri];
-            $controller = new $action[0]($dbConnection);
-
-            //
-            return $controller->{$action[1]}(); 
+        // 2. Direct match (Normalized)
+        foreach ($this->routes[$method] as $route => $action) {
+            // Normalize route for comparison
+            $normalizedRoute = ($route !== '/') ? rtrim($route, '/') : $route;
+            
+            if ($normalizedRoute === $uri) {
+                $controller = new $action[0]($dbConnection);
+                return $controller->{$action[1]}(); 
+            }
         }
 
+        // 3. Dynamic match ({id})
         foreach($this->routes[$method] as $route => $action) {
             $pattern = preg_replace('/\{id\}/', '(\d+)', $route);
-            
-            if(preg_match("#^$pattern$#", $uri, $matches)){
+            // Add delimiters and anchors
+            if(preg_match("#^" . $pattern . "$#", $uri, $matches)){
                 $id = $matches[1];
                 $controller = new $action[0]($dbConnection);
-                
-                // 
                 return $controller->{$action[1]}($id);
             }
         }
 
+        // 4. Detailed Error for Debugging
         http_response_code(404);
         echo json_encode([
-            "error" => "Ruta no encontrada 🕵️‍♂️",
-            "metodo_recibido" => $method,
-            "uri_buscada" => $uri,
-            "rutas_disponibles_para_este_metodo" => array_keys($this->routes[$method] ?? [])
+            "status" => "error",
+            "message" => "Application not found - Router mismatch 🕵️‍♂️",
+            "debug" => [
+                "received_method" => $method,
+                "received_uri" => $uri,
+                "registered_routes" => array_keys($this->routes[$method])
+            ]
         ]);
     }
 }
