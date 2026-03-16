@@ -22,8 +22,5 @@ RUN composer install --no-dev --optimize-autoloader
 # 7. Set permissions
 RUN chown -R www-data:www-data /var/www/html
 
-# 8. THE FIX: Explicitly expose port 80 so Railway maps external traffic here
-EXPOSE 80
-
-# 9. Start Apache properly
-CMD bash -c "a2dismod mpm_event mpm_worker 2>/dev/null || true && a2enmod mpm_prefork && apache2-foreground"
+# 8. THE MASTER STRIKE: Bind dynamic PORT at RUNTIME and start Apache
+CMD bash -c "sed -i 's/Listen 80/Listen \${PORT:-80}/g' /etc/apache2/ports.conf && sed -i 's/:80/:\${PORT:-80}/g' /etc/apache2/sites-available/000-default.conf && a2dismod mpm_event mpm_worker 2>/dev/null || true && a2enmod mpm_prefork && apache2-foreground"
