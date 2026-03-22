@@ -16,6 +16,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev --optimize-autoloader
 RUN chown -R www-data:www-data /var/www/html
 
+# Increse the allowed file upload size
+RUN echo "upload_max_filesize = 20M" > /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "post_max_size = 25M" >> /usr/local/etc/php/conf.d/uploads.ini
+
 # 5. Expose port and apply the original MPM bug fix
 EXPOSE 80
 CMD bash -c "a2dismod mpm_event mpm_worker 2>/dev/null || true && a2enmod mpm_prefork && apache2-foreground"
