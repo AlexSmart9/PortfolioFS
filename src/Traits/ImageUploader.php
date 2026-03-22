@@ -11,7 +11,7 @@ trait ImageUploader {
       $fileExt = strtolower(pathinfo($_FILES[$fileInputName]['name'], PATHINFO_EXTENSION ));
       $allowedExts = ['jpg', 'jpeg', 'png', 'webp'];
 
-      if (in_array(!$fileExt, $allowedExts)) {
+      if (!in_array($fileExt, $allowedExts)) {
 
         throw new \Exception("Formato no válido. Solo JPG, PNG o WEBP");
 

@@ -47,9 +47,6 @@ class PostController {
     // Method to create Post 
     public function createPost() {
 
-
-        
-
         $user = AuthMiddleware::authenticate();
       
 
