@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Models\Certification;
 use App\Middleware\AuthMiddleware;
-use APp\Traits\ImageUploader;
+use App\Traits\ImageUploader;
 
 class CertificationController {
 
