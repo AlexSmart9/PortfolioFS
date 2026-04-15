@@ -83,20 +83,23 @@ class CertificationController {
         AuthMiddleware::authenticate();
 
         // Read new data
-        $data = json_decode(file_get_contents("php://imput", true));
+        $data = $_POST;
 
+        if(isset($data['_method'])) {
+            unset($data['_method']);
+        }
         // Update 
-        $succes = $this->certificationModel->update($id, $data);
+        $success = $this->certificationModel->update($id, $data);
 
-        if($succes) {
+        if($success) {
 
-            http_response_code(201);
+            http_response_code(200);
             echo json_encode(["message" => "Certification updated succesful"]);
 
         } else {
 
             http_response_code(404);
-            echo json_encode(["error" => "Certification not found"]);
+            echo json_encode(["error" => "Certification not found or no changes made"]);
 
         }
     }

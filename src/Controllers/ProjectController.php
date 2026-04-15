@@ -79,18 +79,22 @@ class ProjectController {
     //Method to update a project
     public function updateProject($id) {
 
-        //Aitemtication
+        //Authentication
         AuthMiddleware::authenticate();
 
-        // Reading the new dara
-        $data = json_decode(file_get_contents("php://input"), true);
+        // Reading the new data
+        $data = $_POST;
+
+        if (isset($data['_method'])) {
+            unset($data['_method']);
+        }
 
         // traying to update
-        $succes = $this->projectModel->update($id, $data);
-        if($succes) {
+        $success = $this->projectModel->update($id, $data);
+        if($success) {
             
-            http_response_code(201);
-            echo json_encode(["message" => "Project updated Succeslfully!!"]);
+            http_response_code(200);
+            echo json_encode(["message" => "Project updated Successfully!!"]);
 
         } else {
             

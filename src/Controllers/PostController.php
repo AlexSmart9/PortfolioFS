@@ -71,6 +71,35 @@ class PostController {
         }
     }
 
+    //Method to update a post
+    public function updatePost($id) {
+
+        //Authentication
+        AuthMiddleware::authenticate();
+
+        //Read new data
+        $data = $_POST;
+
+        if (isset($data['_method'])) {
+            unset($data['_method']);
+        }
+
+        $success = $this->postModel->update($id, $data);
+        if($success) {
+            
+            http_response_code(200);
+            echo json_encode(["message" => "Post updated Successfully!!"]);
+
+        } else {
+            
+            http_response_code(404);
+            echo json_encode(["error" => "It couldn't update the Post, Id not found"]);
+        
+        }
+
+    }
+
+
     // Method to delete  post
     public function deletePost($id) {
 
