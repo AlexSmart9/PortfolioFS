@@ -21,7 +21,16 @@ class Router {
          $this->routes['DELETE'][$uri] = $action; 
     }
 
+    
+
     public function dispatch($uri, $method, $dbConnection) {
+
+        // Overrides the POST method (to PUT/PATCH/DELETE) allowing record updates via FormData
+        if ($method === 'POST' && isset($_POST['_method'])) {
+        $method = strtoupper($_POST['_method']);
+        
+        }
+
         // 1. Clean the URI: remove query strings and trim slashes
         $uri = parse_url($uri, PHP_URL_PATH);
         $uri = ($uri !== '/') ? rtrim($uri, '/') : $uri;
