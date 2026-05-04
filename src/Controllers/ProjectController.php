@@ -57,7 +57,9 @@ class ProjectController {
             'description' => $_POST['description'] ?? null,
             'link' => $_POST['link'] ?? null,
             'technologies' => $_POST['technologies'] ?? null,
-            'image_url' => null
+            'image_url' => null,
+            'repo_url' => $_POST['repo_url'] ?? null,
+            'status' => $_POST['status'] ?? null
             
         ]; 
 

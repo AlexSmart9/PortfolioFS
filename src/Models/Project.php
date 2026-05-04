@@ -17,6 +17,8 @@
                     image_url VARCHAR(255),
                     link VARCHAR(255),
                     technologies VARCHAR(100),
+                    repo_url VARCHAR(255),
+                    status VARCHAR(50) DEFAULT 'Planning',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )";
                 
