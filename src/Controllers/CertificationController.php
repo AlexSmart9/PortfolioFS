@@ -51,7 +51,7 @@ class CertificationController {
     public function createCertification() {
 
         // Authentication
-        $user = AuthMiddleware::authenticate();
+        $user = AuthMiddleware::authenticate('admin');
 
         // Reading directly POST REQUEST
         $data = [
@@ -80,7 +80,7 @@ class CertificationController {
     public function updateCertification($id) {
 
         // Autentication
-        AuthMiddleware::authenticate();
+        AuthMiddleware::authenticate('admin');
 
         // Read new data
         $data = $_POST;
@@ -107,7 +107,7 @@ class CertificationController {
     // Method to delete a certification.
     public function deleteCertification($id) {
         // Autentication
-        AuthMiddleware::authenticate();
+        AuthMiddleware::authenticate('admin');
         
         $success = $this->certificationModel->delete($id);
 

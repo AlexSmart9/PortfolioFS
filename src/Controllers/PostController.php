@@ -47,7 +47,7 @@ class PostController {
     // Method to create Post 
     public function createPost() {
 
-        $user = AuthMiddleware::authenticate();
+        $user = AuthMiddleware::authenticate('admin');
       
 
         $data = [
@@ -75,7 +75,7 @@ class PostController {
     public function updatePost($id) {
 
         //Authentication
-        AuthMiddleware::authenticate();
+        AuthMiddleware::authenticate('admin');
 
         //Read new data
         $data = $_POST;
@@ -103,7 +103,7 @@ class PostController {
     // Method to delete  post
     public function deletePost($id) {
 
-        AuthMiddleware::authenticate();
+        AuthMiddleware::authenticate('admin');
         
         if($this->postModel->delete($id)) {
             

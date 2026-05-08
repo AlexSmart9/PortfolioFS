@@ -46,7 +46,7 @@ class SkillController {
     public function createSkill() {
 
         //Autentication
-        $user = AuthMiddleware::authenticate();
+        $user = AuthMiddleware::authenticate('admin');
 
         // Read data from body
         $data = json_decode(file_get_contents("php://input"), true);
@@ -70,7 +70,7 @@ class SkillController {
 
 
         //Autentication
-        AuthMiddleware::authenticate();
+        AuthMiddleware::authenticate('admin');
 
         // Read new Data from body
         $data = json_decode(file_get_contents("php://input"), true);
@@ -93,7 +93,7 @@ class SkillController {
     public function deleteSkill($id) {
 
         //Autentication
-        AuthMiddleware::authenticate();
+        AuthMiddleware::authenticate('admin');
         
         $succes = $this->skillModel->delete($id);
 

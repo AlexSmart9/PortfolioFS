@@ -49,7 +49,7 @@ class ProjectController {
     public function createProject() {
 
           //Autenticatiom
-        $user = AuthMiddleware::authenticate();
+        $user = AuthMiddleware::authenticate('admin');
 
         // reading directly POST REQUEST
         $data = [
@@ -82,7 +82,7 @@ class ProjectController {
     public function updateProject($id) {
 
         //Authentication
-        AuthMiddleware::authenticate();
+        AuthMiddleware::authenticate('admin');
 
         // Reading the new data
         $data = $_POST;
@@ -112,7 +112,7 @@ class ProjectController {
 
 
         // Autentication
-        AuthMiddleware::authenticate();
+        AuthMiddleware::authenticate('admin');
         
         $success = $this->projectModel->delete($id);
 

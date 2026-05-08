@@ -7,7 +7,7 @@ use Exception;
 
 class AuthMiddleware {
 
-    public static function authenticate() {
+    public static function authenticate( $requiredRole = null ) {
 
         // Storing headers sended by client
         $headers = getallheaders();
@@ -20,7 +20,7 @@ class AuthMiddleware {
             $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
         }
 
-        // Verigying header exists amd it got the format "Bearer <token>"
+        // Verifying header exists and it got the format "Bearer <token>"
         if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
 
             http_response_code(401);
@@ -38,7 +38,18 @@ class AuthMiddleware {
 
             $decoded = JWT::decode($token, new Key($secret_key, 'HS256'));
 
-            return $decoded->data;
+            $user = $decoded->data;
+
+            // Authorization to create, delete and update
+            if ($requiredRole !== null) {
+                if(!isset($user->role) || $user->role !== $requiredRole) {
+                    http_response_code(403);
+                    echo json_encode(["error" => "Forbidden: Unauthorized"]);
+                    exit;
+                }
+            }
+
+            return $user;
 
 
         } catch (Exception $e) {
