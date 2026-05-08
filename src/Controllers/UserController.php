@@ -44,16 +44,24 @@ class UserController {
         // Reading data from body
         $data = json_decode(file_get_contents("php://input"), true);
         
-        if(isset($data['title']) && $this->userModel->create($data)) {
+        if(isset($data['name']) && isset($data['email']) && isset($data['password'])) {
             
-            http_response_code(201); // 201 Created
-            echo json_encode(["message" => "User created successfully!"]);
+            // Encrypting password
+            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+
+        
+            if ($this->userModel->create($data)) {
+                http_response_code(201); // 201 Created
+                echo json_encode(["message" => "User created successfully!"]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["error" => "Failed creating user in database"]);
+            }
 
         } else {
-            
-            http_response_code(500);
-            echo json_encode(["error" => "Failed creating user"]);
-        
+            // Error 400 Bad Request
+            http_response_code(400);
+            echo json_encode(["error" => "Missing required fields: name, email or password"]);
         }
     }
 
